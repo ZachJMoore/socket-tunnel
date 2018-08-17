@@ -152,22 +152,28 @@ module.exports = (options) => {
       }
 
       // domains are case insensitive
-      let reqNameNormalized = requestedName.toString().toLowerCase().replace(/[^0-9a-z-]/g, '');
+      let normalizeName = (name) => {
+        return name.toString().toLowerCase().replace(/[^0-9a-z-]/g, '');
+      }
+      let reqNameNormalized = normalizeName(requestedName) 
 
       // make sure the client is requesting a valid subdomain
       if (reqNameNormalized.length === 0 || !isValidDomain(`${reqNameNormalized}.example.com`)) {
         console.log(new Date() + ': ' + reqNameNormalized + ' -- bad subdomain. disconnecting client.');
         if (responseCb) {
-          responseCb('bad subdomain');
+          responseCb({error:'bad subdomain'});
         }
         return socket.disconnect();
       }
 
       // make sure someone else hasn't claimed this subdomain
       if (socketsBySubdomain[reqNameNormalized]) {
-        console.log(new Date() + ': ' + reqNameNormalized + ' requested but already claimed. disconnecting client.');
+        console.log(new Date() + ': ' + reqNameNormalized + ' requested but already claimed. assign random uuid as url');
+
+        reqNameNormalized = normalizeName(uuid())
+
         if (responseCb) {
-          responseCb('subdomain already claimed');
+          responseCb({error: 'subdomain already claimed', url: reqNameNormalized});
         }
         return socket.disconnect();
       }
