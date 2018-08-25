@@ -161,7 +161,7 @@ module.exports = (options) => {
       if (reqNameNormalized.length === 0 || !isValidDomain(`${reqNameNormalized}.example.com`)) {
         console.log(new Date() + ': ' + reqNameNormalized + ' -- bad subdomain. disconnecting client.');
         if (responseCb) {
-          responseCb({error:'bad subdomain'});
+          responseCb(JSON.stringify({error:'bad subdomain'}));
         }
         return socket.disconnect();
       }
@@ -173,7 +173,7 @@ module.exports = (options) => {
         reqNameNormalized = normalizeName(uuid())
 
         if (responseCb) {
-          responseCb({error: 'subdomain already claimed', url: reqNameNormalized});
+          responseCb(JSON.stringify({error: 'subdomain already claimed', url: reqNameNormalized}));
         }
         return socket.disconnect();
       }
